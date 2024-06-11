@@ -6,3 +6,6 @@
 ## 開発環境構築
 pip install fastapi  
 pip install "uvicorn[standard]"
+
+## 起動コマンド
+uvicorn main:app --reload
