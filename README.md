@@ -7,7 +7,8 @@
 pip install fastapi  
 pip install "uvicorn[standard]"  
 pip install pyjwt  
-pip install "passlib[bcrypt]"
+pip install "passlib[bcrypt]"  
+pip install pydantic-settings
 
 ## 起動コマンド
 uvicorn main:app --reload
