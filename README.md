@@ -3,6 +3,9 @@
 ## プロジェクト名
 旅のしおり作成アプリ
 
+## 環境
+Python 3.11.7
+
 ## 開発環境構築
 pip install fastapi  
 pip install "uvicorn[standard]"  
