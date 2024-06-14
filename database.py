@@ -2,9 +2,9 @@
 
 import sqlite3
 
-con = sqlite3.connect("travel_guide.db", check_same_thread=False)
-
-cur = con.cursor()
+def connect_db():
+  con = sqlite3.connect("travel_guide.db", check_same_thread=False)
+  return con.cursor()
 
 # cur.execute("CREATE TABLE user(id, name, email)")
 
@@ -18,9 +18,3 @@ cur = con.cursor()
 # con.commit()
 
 # res = cur.execute("SELECT name FROM user")
-
-# ユーザ情報取得処理
-def get_user(name):
-  sql = "select * from user where name=:name"
-  res = cur.execute(sql, {"name": name})
-  return res.fetchone()
