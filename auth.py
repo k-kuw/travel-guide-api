@@ -6,7 +6,7 @@ from fastapi import Depends, HTTPException, status
 from typing import Annotated
 from datetime import datetime, timedelta, timezone
 from fastapi.security import OAuth2PasswordBearer
-from database import get_user
+from routers.users import get_user
 from config import settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
