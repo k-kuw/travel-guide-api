@@ -4,17 +4,27 @@ import sqlite3
 
 def connect_db():
   con = sqlite3.connect("travel_guide.db", check_same_thread=False)
-  return con.cursor()
+  return con
 
-# cur.execute("CREATE TABLE user(id, name, email)")
+con = sqlite3.connect("travel_guide.db", check_same_thread=False)
+cur = con.cursor()
 
-# res = cur.execute("ALTER TABLE user ADD password")
+cur.execute("DROP TABLE guide")
+cur.execute("DROP TABLE destination")
+cur.execute("DROP TABLE belonging")
+cur.execute("DROP TABLE schedule")
+
+cur.execute("CREATE TABLE guide(id integer primary key autoincrement, title, user_id)")
+cur.execute("CREATE TABLE destination(id integer primary key autoincrement, guide_id, place)")
+cur.execute("CREATE TABLE belonging(id integer primary key autoincrement, guide_id, item)")
+cur.execute("CREATE TABLE schedule(id integer primary key autoincrement, guide_id, time, place, activity, note)")
+
+
+# cur.execute("CREATE TABLE user(id integer primary key autoincrement, name text, email text, password text)")
 
 # sql = "insert into user(name, email, password) values(?, ?, ?)"
-# data = [('旅栞', 'tabi@example.com', 'tabi'), ('塩栞', 'shio@example.com', 'shio')]
+# data = [('旅栞', 'tabi@example.com', '$2b$12$QdST9d/V9JObamcsCLDeMOQ1v5RGtooJBHSVaOXjqzK130cJBhYRq'), ('塩栞', 'shio@example.com', '$2b$12$Ii/fMuCx40PJyBINu1Tm0uVoTk9iXtOn/1UiT8fiKC3WMrevkoMfu')]
 # cur.executemany(sql, data)
-# sql = "update user set password='$2b$12$Ii/fMuCx40PJyBINu1Tm0uVoTk9iXtOn/1UiT8fiKC3WMrevkoMfu' where password='shio'"
-# cur.execute(sql)
 # con.commit()
 
 # res = cur.execute("SELECT name FROM user")
