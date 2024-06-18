@@ -5,8 +5,7 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from config import settings
-from pydantic import BaseModel
-from auth import Token, User, get_current_user, authenticate_user, create_access_token
+from auth import Token, authenticate_user, create_access_token
 from routers import users, guides
 
 
