@@ -27,4 +27,7 @@ cur = con.cursor()
 # cur.executemany(sql, data)
 # con.commit()
 
+# cur.execute("alter table destination add lon")
+# cur.execute("alter table destination add lat")
+
 # res = cur.execute("SELECT name FROM user")

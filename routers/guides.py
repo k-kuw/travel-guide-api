@@ -8,9 +8,13 @@ from routers.users import User, get_user_by_name
 class Destination(BaseModel):
   id: int
   name: str
+  lon: str
+  lat: str
+
 class Belongings(BaseModel):
   id: int
   name: str
+
 class Schedule(BaseModel):
   time: str
   place: str
@@ -32,6 +36,22 @@ router = APIRouter(
 @router.get("/")
 async def init_guides():
   return {"guide": "Tokyo"}
+
+# しおり取得処理
+@router.get("/search")
+async def search_guides(user: User = Depends(get_current_user)):
+  user_id = user[0]
+  if not user_id:
+    raise HTTPException(status_code=400, detail="Not User Found")
+  con = connect_db()
+  cursor = con.cursor()
+  sql = "select id, title from guide where user_id=:user_id"
+  data = {"user_id": user_id}
+  result = cursor.execute(sql, data).fetchall()
+  guide_list = []
+  for guide in result:
+    guide_list.append({"id": guide[0], "title": guide[1]})
+  return guide_list
 
 # しおり登録処理
 @router.post("/register")
@@ -55,11 +75,10 @@ def create_guide(guide):
     # 登録したしおりのIDを取得
     guide_id = cursor.execute(sql, data).fetchone()[0]
     # 目的地登録
-    # TODO 緯度経度追加予定
-    sql = "insert into destination(guide_id, place) values(:guide_id, :place)"
+    sql = "insert into destination(guide_id, place, lon, lat) values(:guide_id, :place, :lon, :lat)"
     data = []
     for place in guide.destinations:
-      data.append({"guide_id": guide_id, "place": place.name})
+      data.append({"guide_id": guide_id, "place": place.name, "lon": place.lon, "lat": place.lat})
     cursor.executemany(sql, data)
     # 持ち物登録
     sql = "insert into belonging(guide_id, item) values(:guide_id, :item)"

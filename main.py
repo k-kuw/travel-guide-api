@@ -6,13 +6,14 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from config import settings
 from auth import Token, authenticate_user, create_access_token
-from routers import users, guides
+from routers import users, guides, map
 
 
 app = FastAPI()
 
 app.include_router(users.router)
 app.include_router(guides.router)
+app.include_router(map.router)
 
 # CORS対応
 origins = [
