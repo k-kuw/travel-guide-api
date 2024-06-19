@@ -53,6 +53,48 @@ async def search_guides(user: User = Depends(get_current_user)):
     guide_list.append({"id": guide[0], "title": guide[1]})
   return guide_list
 
+# しおり詳細取得処理
+@router.get("/search/{guide_id}")
+async def search_guide(guide_id: int, user: User = Depends(get_current_user)):
+  user_id = user[0]
+  con = connect_db()
+  cursor = con.cursor()
+  # しおり情報取得
+  sql = "select id, title from guide where id=:guide_id and user_id=:user_id"
+  data = {"guide_id": guide_id, "user_id": user_id}
+  guide_result = cursor.execute(sql, data).fetchone()
+  if not guide_result:
+    raise HTTPException(status_code=400, detail="Not Found Guide")
+  # 目的地情報取得
+  sql = "select place, lon, lat from destination where guide_id=:guide_id"
+  data = {"guide_id": guide_id}
+  destinations_result = cursor.execute(sql, data).fetchall()
+  destination_list = []
+  for destination in destinations_result:
+    destination_list.append({"name": destination[0], "lon": destination[1], "lat": destination[2]})
+  # 持ち物情報取得
+  sql = "select item from belonging where guide_id=:guide_id"
+  data = {"guide_id": guide_id}
+  belongings_result = cursor.execute(sql, data).fetchall()
+  belonging_list = []
+  for belonging in belongings_result:
+    belonging_list.append({"name": belonging[0]})
+  # スケジュール情報取得
+  sql = "select time, place, activity, note from schedule where guide_id=:guide_id"
+  data = {"guide_id": guide_id}
+  schedules_result = cursor.execute(sql, data).fetchall()
+  schedule_list = []
+  for schedule in schedules_result:
+    schedule_list.append({"time": schedule[0], "place": schedule[1], "activity": schedule[2], "note": schedule[3]})
+
+  return {
+    "title": guide_result[1], 
+    "destinations": destination_list, 
+    "belongings": belonging_list,
+    "schedules": schedule_list
+  }
+
+
 # しおり登録処理
 @router.post("/register")
 async def register_guide(guide: Guide, user: User = Depends(get_current_user)):
