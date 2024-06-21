@@ -53,7 +53,7 @@ async def search_guides(user: User = Depends(get_current_user)):
     guide_list.append({"id": guide[0], "title": guide[1]})
   return guide_list
 
-# しおり詳細取得処理
+# しおり詳細取得処理ret
 @router.get("/search/{guide_id}")
 async def search_guide(guide_id: int, user: User = Depends(get_current_user)):
   user_id = user[0]
