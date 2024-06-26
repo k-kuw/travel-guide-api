@@ -33,6 +33,12 @@ app.add_middleware(
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Token:
+    if (not form_data.username or not form_data.password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Insufficient input",
+            headers={"WWW-Authenticate": "Bearer"},
+            )
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(
