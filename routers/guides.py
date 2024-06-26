@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from typing import List
 from auth import get_current_user
@@ -42,7 +42,7 @@ async def init_guides():
 async def search_guides(user: User = Depends(get_current_user)):
   user_id = user[0]
   if not user_id:
-    raise HTTPException(status_code=400, detail="Not User Found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not User Found")
   con = connect_db()
   cursor = con.cursor()
   sql = "select id, title from guide where user_id=:user_id"
@@ -64,7 +64,7 @@ async def search_guide(guide_id: int, user: User = Depends(get_current_user)):
   data = {"guide_id": guide_id, "user_id": user_id}
   guide_result = cursor.execute(sql, data).fetchone()
   if not guide_result:
-    raise HTTPException(status_code=400, detail="Not Found Guide")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found Guide")
   # 目的地情報取得
   sql = "select place, lon, lat from destination where guide_id=:guide_id"
   data = {"guide_id": guide_id}
@@ -98,9 +98,11 @@ async def search_guide(guide_id: int, user: User = Depends(get_current_user)):
 # しおり登録処理
 @router.post("/register")
 async def register_guide(guide: Guide, user: User = Depends(get_current_user)):
+  if (not guide.title):
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Insufficient input")
   result = create_guide(guide)
   if not result:
-    raise HTTPException(status_code=400, detail="Guide regist error")
+    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Guide register error")
   return guide
 
 # しおりDB登録処理

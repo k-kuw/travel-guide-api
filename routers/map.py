@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from geopy.geocoders import Nominatim
 
 from auth import get_current_user
@@ -18,6 +18,6 @@ async def search_address(location: Location, user: User = Depends(get_current_us
   geolocator = Nominatim(user_agent="travel-guide")
   location = geolocator.geocode(location.name)
   if not location:
-    raise HTTPException(status_code=400, detail="Not Found Location")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found Location")
   else:
     return location.raw
