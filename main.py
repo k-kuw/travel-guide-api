@@ -51,23 +51,3 @@ async def login_for_access_token(
         data={"sub": user[0]}, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-# @app.get("/users/me/", response_model=User)
-# async def read_users_me(
-#     current_user: Annotated[User, Depends(get_current_user)],
-# ):
-#     return current_user
-
-# @app.get("/users/me/items/")
-# async def read_own_items(
-#     current_user: Annotated[User, Depends(get_current_user)],
-# ):
-#     return [{"item_id": "Foo", "owner": current_user.username}]
-
-# @app.get("/items/")
-# async def read_items(token: Annotated[str, Depends(oauth2_scheme)]):
-#     return {"token": token}

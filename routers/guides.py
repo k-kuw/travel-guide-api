@@ -5,22 +5,26 @@ from auth import get_current_user
 from database import connect_db
 from routers.users import User, get_user_by_name
 
+# 目的地クラス
 class Destination(BaseModel):
   id: int
   name: str
   lon: str
   lat: str
 
+# 持ち物クラス
 class Belongings(BaseModel):
   id: int
   name: str
 
+# スケジュールクラス
 class Schedule(BaseModel):
   time: str
   place: str
   activity: str
   note: str
 
+# しおりクラス
 class Guide(BaseModel):
   username: str
   title: str
@@ -33,16 +37,14 @@ router = APIRouter(
   tags=["guides"]
 )
 
-@router.get("/")
-async def init_guides():
-  return {"guide": "Tokyo"}
-
 # しおり取得処理
 @router.get("/search")
 async def search_guides(user: User = Depends(get_current_user)):
   user_id = user[0]
+  # ユーザがDBに存在しない場合
   if not user_id:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not User Found")
+  # DB情報取得
   con = connect_db()
   cursor = con.cursor()
   sql = "select id, title from guide where user_id=:user_id"
@@ -57,12 +59,13 @@ async def search_guides(user: User = Depends(get_current_user)):
 @router.get("/search/{guide_id}")
 async def search_guide(guide_id: int, user: User = Depends(get_current_user)):
   user_id = user[0]
+  # しおり情報取得
   con = connect_db()
   cursor = con.cursor()
-  # しおり情報取得
   sql = "select id, title from guide where id=:guide_id and user_id=:user_id"
   data = {"guide_id": guide_id, "user_id": user_id}
   guide_result = cursor.execute(sql, data).fetchone()
+  # しおり情報が取得できなかった場合
   if not guide_result:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found Guide")
   # 目的地情報取得
@@ -98,22 +101,22 @@ async def search_guide(guide_id: int, user: User = Depends(get_current_user)):
 # しおり登録処理
 @router.post("/register")
 async def register_guide(guide: Guide, user: User = Depends(get_current_user)):
+  # タイトル入力内容がなかった場合
   if (not guide.title):
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Insufficient input")
   result = create_guide(guide)
+  # しおり登録に失敗した場合
   if not result:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Guide register error")
   return guide
 
 # しおりDB登録処理
 def create_guide(guide):
-  print("create title")
   try:
     user_id = get_user_by_name(guide.username)[0]
-    # データベース接続
+    # しおり登録
     con = connect_db()
     cursor = con.cursor()
-    # しおり登録
     sql = "insert into guide(title, user_id) values(:title, :user_id) returning id"
     data = {"title": guide.title, "user_id": user_id}
     # 登録したしおりのIDを取得

@@ -10,9 +10,10 @@ con = sqlite3.connect("travel_guide.db", check_same_thread=False)
 cur = con.cursor()
 
 # cur.execute("delete from user where id=5")
-
-
-
+# cur.execute("delete from guide")
+# cur.execute("delete from destination")
+# cur.execute("delete from belonging")
+# cur.execute("delete from schedule")
 
 # cur.execute("DROP TABLE guide")
 # cur.execute("DROP TABLE destination")
