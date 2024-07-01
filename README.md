@@ -14,21 +14,23 @@ pip install "passlib[bcrypt]"
 pip install pydantic-settings
 
 ## ディレクトリ構成
-.
-├── README.md
-├── __init__.py
-├── __pycache__
-├── auth.py
-├── config.py
-├── database.py
-├── main.py
-├── routers
-│   ├── __init__.py
-│   ├── __pycache__
-│   ├── guides.py
-│   ├── map.py
-│   └── users.py
-└── travel_guide.db
+<pre>
+  .
+  ├── README.md
+  ├── __init__.py
+  ├── __pycache__
+  ├── auth.py
+  ├── config.py
+  ├── database.py
+  ├── main.py
+  ├── routers
+  │   ├── __init__.py
+  │   ├── __pycache__
+  │   ├── guides.py
+  │   ├── map.py
+  │   └── users.py
+  └── travel_guide.db
+</pre>
 
 ## 起動コマンド
 uvicorn main:app --reload
