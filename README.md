@@ -32,5 +32,15 @@ pip install pyjwt
 pip install "passlib[bcrypt]"  
 pip install pydantic-settings
 
+## 環境変数(.envファイル)
+- トークンキー(str)
+SECRET_KEY
+- トークンアルゴリズム(int)
+ALGORITHM
+- トークン有効期限(str)
+ACCESS_TOKEN_EXPIRE_MINUTES
+- 画面URL(str)
+BROWSER_URL
+
 ## 起動コマンド
 uvicorn main:app --reload
