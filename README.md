@@ -6,13 +6,6 @@ Python 3.11.7
 FastAPI 0.111.0
 Uvicorn 0.30.1
 
-## 開発環境構築コマンド
-pip install fastapi  
-pip install "uvicorn[standard]"  
-pip install pyjwt  
-pip install "passlib[bcrypt]"  
-pip install pydantic-settings
-
 ## ディレクトリ構成
 <pre>
 .
@@ -31,6 +24,13 @@ pip install pydantic-settings
 │   └── users.py
 └── travel_guide.db
 </pre>
+
+## 環境構築コマンド
+pip install fastapi  
+pip install "uvicorn[standard]"  
+pip install pyjwt  
+pip install "passlib[bcrypt]"  
+pip install pydantic-settings
 
 ## 起動コマンド
 uvicorn main:app --reload
