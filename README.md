@@ -15,21 +15,21 @@ pip install pydantic-settings
 
 ## ディレクトリ構成
 <pre>
-  .
-  ├── README.md
-  ├── __init__.py
-  ├── __pycache__
-  ├── auth.py
-  ├── config.py
-  ├── database.py
-  ├── main.py
-  ├── routers
-  │   ├── __init__.py
-  │   ├── __pycache__
-  │   ├── guides.py
-  │   ├── map.py
-  │   └── users.py
-  └── travel_guide.db
+.
+├── README.md
+├── __init__.py
+├── __pycache__
+├── auth.py
+├── config.py
+├── database.py
+├── main.py
+├── routers
+│   ├── __init__.py
+│   ├── __pycache__
+│   ├── guides.py
+│   ├── map.py
+│   └── users.py
+└── travel_guide.db
 </pre>
 
 ## 起動コマンド
