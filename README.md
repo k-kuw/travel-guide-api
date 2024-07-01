@@ -33,13 +33,13 @@ pip install "passlib[bcrypt]"
 pip install pydantic-settings
 
 ## 環境変数(.envファイル)
-- トークンキー(str)
+- トークンキー(文字列)
 SECRET_KEY
-- トークンアルゴリズム(int)
+- トークンアルゴリズム(文字列)
 ALGORITHM
-- トークン有効期限(str)
+- トークン有効期限(数値)
 ACCESS_TOKEN_EXPIRE_MINUTES
-- 画面URL(str)
+- 画面URL(文字列)
 BROWSER_URL
 
 ## 起動コマンド
