@@ -3,14 +3,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-
-# SQLALCHEMY_DATABASE_URL = "postgresql://travel_guide_db_user:KMwsMAozhTVuVXMznQBTmIteUJKLmBIP@dpg-cq2b6nlds78s73ebbqa0-a.oregon-postgres.render.com/travel_guide_db"
-
-
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:postgresql@localhost:5432/travelguidedb"
+from config import settings
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL
+    settings.sqlalchemy_database_url
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
