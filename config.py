@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     algorithm: str
     access_token_expire_minutes: int
     browser_url: str
+    sqlalchemy_database_url: str
 
     model_config = SettingsConfigDict(env_file=".env")
 
