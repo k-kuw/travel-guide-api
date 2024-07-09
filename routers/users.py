@@ -1,13 +1,9 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from passlib.context import CryptContext
-from database import connect_db
-
-# ユーザクラス
-class User(BaseModel):
-    username: str
-    email: str
-    password: str
+from db.database import get_db
+from db import models, schemas
+from sqlalchemy.orm import Session
 
 router = APIRouter(
   prefix="/users",
@@ -15,22 +11,21 @@ router = APIRouter(
 )
 
 # ユーザDB登録処理
-@router.post("/register")
-async def register_user(user: User):
+@router.post("/register", response_model=schemas.User)
+async def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
   try: 
-    if(not user.username or not user.email or not user.password):
+    if(not user.name or not user.email or not user.password):
       raise Exception("Insufficient input")
     if(len(user.password) <= 4):
       raise Exception("Password needs more than 5 characters")
     # パスワードのハッシュ化
     hashed_password = get_password_hash(user.password)
     # ユーザ登録
-    con = connect_db()
-    cursor = con.cursor()
-    sql = "insert into user(name, email, password) values(:name, :email, :password) returning name"
-    data = {"name": user.username, "email": user.email, "password": hashed_password}
-    res = cursor.execute(sql, data).fetchone()[0]
-    con.commit()
+    db_user = models.User(name=user.name, email=user.email, hashed_password=hashed_password)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
   except Exception as e:
     # 入力内容が不十分な場合
     if("Insufficient" in e.args[0]):
@@ -44,7 +39,6 @@ async def register_user(user: User):
     # その他例外発生時
     else:
       raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="user register error") 
-  return get_user_by_name(res)
 
 # パスワードハッシュ化処理
 def get_password_hash(password):
@@ -52,16 +46,8 @@ def get_password_hash(password):
   return pwd_context.hash(password)
 
 # ユーザ情報取得処理
-def get_user_by_name(name):
-  con = connect_db()
-  cursor = con.cursor()
-  sql = "select * from user where name=:name"
-  res = cursor.execute(sql, {"name": name})
-  return res.fetchone()
+def get_user_by_name(db: Session, name: str):
+  return db.query(models.User).filter(models.User.name == name).first()
 
-def get_user_by_id(id):
-  con = connect_db()
-  cursor = con.cursor()
-  sql = "select * from user where id=:id"
-  res = cursor.execute(sql, {"id": id})
-  return res.fetchone()
+def get_user_by_id(db: Session, id: int):
+  return db.query(models.User).filter(models.User.id == id).first()

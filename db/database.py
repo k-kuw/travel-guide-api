@@ -1,5 +1,31 @@
 # DB構築用ファイル
 
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+# SQLALCHEMY_DATABASE_URL = "postgresql://travel_guide_db_user:KMwsMAozhTVuVXMznQBTmIteUJKLmBIP@dpg-cq2b6nlds78s73ebbqa0-a.oregon-postgres.render.com/travel_guide_db"
+
+
+SQLALCHEMY_DATABASE_URL = "postgresql://postgres:postgresql@localhost:5432/travelguidedb"
+
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL
+)
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+
 import sqlite3
 
 def connect_db():
