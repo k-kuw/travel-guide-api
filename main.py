@@ -1,13 +1,16 @@
 from datetime import timedelta
 from typing import Annotated
-
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from config import settings
 from auth import Token, authenticate_user, create_access_token
 from routers import users, guides, map
+from sqlalchemy.orm import Session
+from db import models
+from db.database import engine, get_db
 
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -31,7 +34,7 @@ app.add_middleware(
 # ログイン認証(トークン)処理
 @app.post("/token")
 async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)
 ) -> Token:
     if (not form_data.username or not form_data.password):
         raise HTTPException(
@@ -39,7 +42,7 @@ async def login_for_access_token(
             detail="Insufficient input",
             headers={"WWW-Authenticate": "Bearer"},
             )
-    user = authenticate_user(form_data.username, form_data.password)
+    user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -48,6 +51,6 @@ async def login_for_access_token(
         )
     access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
     access_token = create_access_token(
-        data={"sub": user[0]}, expires_delta=access_token_expires
+        data={"sub": user.id}, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")
