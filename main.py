@@ -4,7 +4,7 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from config import settings
-from auth import Token, authenticate_user, create_access_token
+from auth import Token, authenticate_user, create_access_token, header_scheme, verify_api_key
 from routers import users, guides, map
 from sqlalchemy.orm import Session
 from db import models
@@ -34,8 +34,9 @@ app.add_middleware(
 # ログイン認証(トークン)処理
 @app.post("/token")
 async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], api_key: str = Depends(header_scheme), db: Session = Depends(get_db)
 ) -> Token:
+    verify_api_key(api_key)
     if (not form_data.username or not form_data.password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
