@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from typing import List
-from auth import get_current_user, header_scheme, verify_api_key
-from routers.users import get_user_by_name
+from auth import get_current_user, get_user_by_name, header_scheme, verify_api_key
 from db.database import get_db
 from db import models, schemas
 from sqlalchemy.orm import Session

@@ -6,10 +6,11 @@ from fastapi import Depends, HTTPException, status
 from typing import Annotated
 from datetime import datetime, timedelta, timezone
 from fastapi.security import OAuth2PasswordBearer, APIKeyHeader
-from routers.users import get_user_by_name, get_user_by_id
 from config import settings
 from sqlalchemy.orm import Session
+from db import models
 from db.database import get_db
+from passlib.context import CryptContext
 
 header_scheme = APIKeyHeader(name="x-api-key")
 
@@ -33,6 +34,18 @@ class TokenData(BaseModel):
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# パスワードハッシュ化処理
+def get_password_hash(password):
+    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    return pwd_context.hash(password)
+
+# ユーザ情報取得処理
+def get_user_by_name(db: Session, name: str):
+    return db.query(models.User).filter(models.User.name == name).first()
+
+def get_user_by_id(db: Session, id: int):
+    return db.query(models.User).filter(models.User.id == id).first()
 
 # パスワード検証処理
 def verify_password(plain_password, hashed_password):

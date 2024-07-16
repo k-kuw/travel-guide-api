@@ -1,27 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from passlib.context import CryptContext
 from db.database import get_db
 from db import models, schemas
 from sqlalchemy.orm import Session
-from config import settings
-from fastapi.security import APIKeyHeader
-
+from auth import header_scheme, verify_api_key, get_password_hash
 
 router = APIRouter(
   prefix="/users",
   tags=["users"]
 )
-
-header_scheme = APIKeyHeader(name="x-api-key")
-
-# apiキー認証処理
-def verify_api_key(api_key):
-    if api_key != settings.api_key:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Invalid API Key"
-        )
-    return
 
 # ユーザDB登録処理
 @router.post("/register", response_model=schemas.User)
@@ -53,15 +39,3 @@ async def register_user(user: schemas.UserCreate, api_key: str = Depends(header_
     # その他例外発生時
     else:
       raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="user register error") 
-
-# パスワードハッシュ化処理
-def get_password_hash(password):
-  pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-  return pwd_context.hash(password)
-
-# ユーザ情報取得処理
-def get_user_by_name(db: Session, name: str):
-  return db.query(models.User).filter(models.User.name == name).first()
-
-def get_user_by_id(db: Session, id: int):
-  return db.query(models.User).filter(models.User.id == id).first()
