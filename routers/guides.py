@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from typing import List
-from auth import get_current_user
-from db.database import connect_db
+from auth import get_current_user, header_scheme, verify_api_key
 from routers.users import get_user_by_name
 from db.database import get_db
 from db import models, schemas
@@ -35,7 +34,8 @@ router = APIRouter(
 
 # しおり取得処理
 @router.get("/search", response_model=List[schemas.Guide])
-async def search_guides(user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
+async def search_guides(user: schemas.User = Depends(get_current_user), api_key: str = Depends(header_scheme), db: Session = Depends(get_db)):
+  verify_api_key(api_key)
   # ユーザがDBに存在しない場合
   if not user.id:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not User Found")
@@ -44,7 +44,8 @@ async def search_guides(user: schemas.User = Depends(get_current_user), db: Sess
 
 # しおり詳細取得処理
 @router.get("/search/{guide_id}")
-async def search_guide(guide_id: int, user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
+async def search_guide(guide_id: int, user: schemas.User = Depends(get_current_user), api_key: str = Depends(header_scheme), db: Session = Depends(get_db)):
+  verify_api_key(api_key)
   # しおり情報取得
   guide_result = db.query(models.Guide).filter(models.Guide.id == guide_id, models.Guide.user_id == user.id).first()
   # しおり情報が取得できなかった場合
@@ -61,7 +62,8 @@ async def search_guide(guide_id: int, user: schemas.User = Depends(get_current_u
 
 # しおり登録処理
 @router.post("/register")
-async def register_guide(guide: schemas.GuideCreate, user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
+async def register_guide(guide: schemas.GuideCreate, user: schemas.User = Depends(get_current_user), api_key: str = Depends(header_scheme), db: Session = Depends(get_db)):
+  verify_api_key(api_key)
   # タイトル入力内容がなかった場合
   if (not guide.title):
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Insufficient input")
@@ -102,7 +104,8 @@ async def register_guide(guide: schemas.GuideCreate, user: schemas.User = Depend
 
 # しおり更新処理
 @router.put("/update")
-async def update_guide(guide: schemas.GuideUpdate, user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
+async def update_guide(guide: schemas.GuideUpdate, user: schemas.User = Depends(get_current_user), api_key: str = Depends(header_scheme), db: Session = Depends(get_db)):
+  verify_api_key(api_key)
   # タイトル入力内容がなかった場合
   if (not guide.title):
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Insufficient input")
@@ -153,7 +156,8 @@ async def update_guide(guide: schemas.GuideUpdate, user: schemas.User = Depends(
 
 # しおり削除処理
 @router.delete("/delete/{guide_id}")
-async def delete_guide(guide_id: int, user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
+async def delete_guide(guide_id: int, user: schemas.User = Depends(get_current_user), api_key: str = Depends(header_scheme), db: Session = Depends(get_db)):
+  verify_api_key(api_key)
   guide = db.get(models.Guide, guide_id)
   if not guide:
     raise HTTPException(status_code=404, detail="Guide not found")

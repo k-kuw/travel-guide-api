@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from geopy.geocoders import Nominatim
-from auth import get_current_user
+from auth import get_current_user, header_scheme, verify_api_key
 from db import schemas
 from pydantic import BaseModel
 
@@ -15,7 +15,8 @@ router = APIRouter(
 
 # 地点情報取得処置
 @router.post("/search-address")
-async def search_address(location: Location, user: schemas.User = Depends(get_current_user)):
+async def search_address(location: Location, user: schemas.User = Depends(get_current_user), api_key: str = Depends(header_scheme)):
+  verify_api_key(api_key)
   geo_locator = Nominatim(user_agent="travel-guide")
   location = geo_locator.geocode(location.name)
   # 地点が見つからなかった場合

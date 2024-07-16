@@ -5,11 +5,22 @@ from pydantic import BaseModel
 from fastapi import Depends, HTTPException, status
 from typing import Annotated
 from datetime import datetime, timedelta, timezone
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, APIKeyHeader
 from routers.users import get_user_by_name, get_user_by_id
 from config import settings
 from sqlalchemy.orm import Session
 from db.database import get_db
+
+header_scheme = APIKeyHeader(name="x-api-key")
+
+# apiキー認証処理
+def verify_api_key(api_key):
+    if api_key != settings.api_key:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid API Key"
+        )
+    return
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 

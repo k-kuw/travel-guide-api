@@ -1,18 +1,32 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
 from passlib.context import CryptContext
 from db.database import get_db
 from db import models, schemas
 from sqlalchemy.orm import Session
+from config import settings
+from fastapi.security import APIKeyHeader
+
 
 router = APIRouter(
   prefix="/users",
   tags=["users"]
 )
 
+header_scheme = APIKeyHeader(name="x-api-key")
+
+# apiキー認証処理
+def verify_api_key(api_key):
+    if api_key != settings.api_key:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid API Key"
+        )
+    return
+
 # ユーザDB登録処理
 @router.post("/register", response_model=schemas.User)
-async def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+async def register_user(user: schemas.UserCreate, api_key: str = Depends(header_scheme), db: Session = Depends(get_db)):
+  verify_api_key(api_key)
   try: 
     if(not user.name or not user.email or not user.password):
       raise Exception("Insufficient input")
